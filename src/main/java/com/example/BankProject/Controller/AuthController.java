@@ -3,6 +3,7 @@ package com.example.BankProject.Controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -45,6 +46,12 @@ public class AuthController {
     private final CustomerRepository customerRepo;
     private final CustomerRegistrationService registrationService;
 
+    @Value("${app.cookie.secure}")
+    private boolean cookieSecure;
+
+    @Value("${app.cookie.samesite}")
+    private String cookieSameSite;
+
     public AuthController(JwtUtil jwtUtil,
                           UserServiceImple userService,
                           AuthenticationManager authenticationManager,
@@ -86,8 +93,8 @@ public class AuthController {
 
         ResponseCookie cookie = ResponseCookie
                 .from("refreshToken", refreshToken)
-                .httpOnly(true).secure(false).path("/")
-                .maxAge(7 * 24 * 60 * 60).sameSite("Strict").build();
+                .httpOnly(true).secure(cookieSecure).path("/")
+                .maxAge(7 * 24 * 60 * 60).sameSite(cookieSameSite).build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
         Long customerId = null;
@@ -155,8 +162,8 @@ public class AuthController {
 
         ResponseCookie newCookie = ResponseCookie
                 .from("refreshToken", newRefreshToken)
-                .httpOnly(true).secure(false).path("/")
-                .maxAge(7 * 24 * 60 * 60).sameSite("Strict").build();
+                .httpOnly(true).secure(cookieSecure).path("/")
+                .maxAge(7 * 24 * 60 * 60).sameSite(cookieSameSite).build();
         response.addHeader(HttpHeaders.SET_COOKIE, newCookie.toString());
 
         Long customerId = null;
@@ -176,7 +183,8 @@ public class AuthController {
     public String logout(HttpServletResponse response) {
         ResponseCookie deleteCookie = ResponseCookie
                 .from("refreshToken", "")
-                .httpOnly(true).secure(false).path("/").maxAge(0).build();
+                .httpOnly(true).secure(cookieSecure).path("/")
+                .sameSite(cookieSameSite).maxAge(0).build();
         response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
         return "Logged out successfully";
     }
