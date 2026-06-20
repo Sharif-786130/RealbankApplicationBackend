@@ -1,15 +1,11 @@
 package com.example.BankProject.JWT;
-
 import java.time.LocalDateTime;
-
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
 import com.example.BankProject.ENUM.Role;
 import com.example.BankProject.Entity.User;
 import com.example.BankProject.Repository.UserRepository;
-
 @Component
 public class DataInitializer implements CommandLineRunner{
 	
@@ -35,11 +31,11 @@ public class DataInitializer implements CommandLineRunner{
 			superadmin.setActive(true);
 			superadmin.setPhone("93982457381");
 			superadmin.setCreatedAt(LocalDateTime.now());
+			superadmin.setPasswordResetRequired(false);
 			
 			userRepo.save(superadmin);
 			
 			System.out.println("SuperAdmin created Successfully");
 		}
 	}
-
 }
