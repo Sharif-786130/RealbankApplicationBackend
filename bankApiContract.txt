@@ -1,0 +1,938 @@
+                               ADMIN 
+1. Employee (Staff) Management
+
+Create new employees
+
+Assign roles
+
+Activate/suspend/terminate employee accounts
+
+2. Customer Management Oversight
+
+View all customer records
+
+Override customer status (active/suspended/blocked) for compliance reasons
+
+3. System-Wide Account Monitoring
+
+View all bank accounts
+
+Freeze/unfreeze accounts for fraud or legal purposes
+
+4. High-Level Transaction Monitoring
+
+View all transactions across the bank
+
+Filter by: type, account, branch, employee, suspicious flags
+
+5. Loan Policy & Approval Management
+
+Define loan rules/parameters (interest rates, limits)
+
+Approve high-value loans that exceed employee authority
+
+6. Card Services Oversight
+
+View all card issuance/blocks
+
+Force card block for risk/security events
+
+7. Reporting & Audit Logs
+
+View financial reports (accounts, transactions, loans)
+
+Access system audit logs (logins, employee actions, changes)
+
+
+
+
+
+                       Employee
+
+
+
+EMPLOYEE (STAFF) – 10 Core Features
+1. Customer Onboarding
+
+Create new customer records with KYC details.
+
+2. Customer Profile Update
+
+Modify customer info (address, contact, KYC updates).
+
+3. Customer Status Management
+
+Activate, suspend, or block accounts.
+
+4. Bank Account Opening
+
+Open Savings/Current accounts for existing customers.
+
+5. Account Closure Requests
+
+Process account closure (soft delete or archive).
+
+6. Cash Deposit (Teller)
+
+Deposit cash into customer accounts from the branch.
+
+7. Cash Withdrawal (Teller)
+
+Withdraw cash for walk-in customers with authorization.
+
+8. Loan Application Processing
+
+Receive loan requests submitted by customers and verify documents.
+
+9. Loan Approval / Rejection
+
+Approve or reject loans based on authority level.
+
+10. Card Issuance / Replacement
+
+Initiate or replace debit/credit cards for a customer.
+
+
+
+                  Customer 
+
+
+1. View & Update Profile
+
+View personal data and update contact information.
+
+2. View Bank Accounts
+
+List all accounts and balances.
+
+3. View Account Details
+
+Check account information and status.
+
+4. Transaction History
+
+View deposits, withdrawals, transfers, and statements.
+
+5. Fund Transfer (Internal & External)
+
+Send money to:
+
+Own accounts
+
+Other accounts in same bank
+
+Other banks
+
+6. Loan Application
+
+Apply for personal, auto, home, or business loans.
+
+7. View Loan Status
+
+Track application status (Pending/Approved/Rejected).
+
+8. Request Card (Debit/Credit)
+
+Apply for new card associated with any account.
+
+9. Block / Unblock Card
+
+In case of theft or misuse.
+
+10. Raise Support Ticket
+
+Create and track tickets for complaints, queries, service requests.
+
+
+
+                Request and Response 
+
+                            1. Login
+POST /auth/login
+
+Request
+{
+  "username": "string",
+  "password": "string"
+}
+
+Response
+{
+  "accessToken": "string",
+  "refreshToken": "string",
+  "role": "ADMIN | EMPLOYEE | CUSTOMER",
+  "userId": "string"
+}
+                         2. Refresh Token
+POST /auth/refresh
+
+Request
+{
+  "refreshToken": "string"
+}
+
+Response
+{
+  "accessToken": "string"
+}
+
+                               3. Logout
+POST /auth/logout
+Request
+{
+  "refreshToken": "string"
+}
+
+                             Admin Module
+
+1. Employee Management – Create Employee
+POST /admin/employees
+
+Request
+{
+  "name": "string",
+  "email": "string",
+  "phone": "string",
+  "role": "EMPLOYEE",
+  "password": "string"
+}
+
+Response
+{
+  "employeeId": "string",
+  "message": "Employee created successfully"
+}
+
+2. Employee Management – Update Employee
+PUT /admin/employees/{employeeId}
+
+Request
+{
+  "name": "string",
+  "email": "string",
+  "status": "ACTIVE | INACTIVE | TERMINATED"
+}
+
+3. Customer Oversight – Update Customer Status
+PATCH /admin/customers/{customerId}/status
+
+Request
+{
+  "status": "ACTIVE | SUSPENDED | BLOCKED"
+}
+
+4. View All Accounts
+GET /admin/accounts
+
+Response
+[
+  {
+    "accountId": "string",
+    "customerId": "string",
+    "type": "SAVINGS",
+    "balance": 5000,
+    "status": "ACTIVE"
+  }
+]
+
+5. Freeze/Unfreeze Account
+PATCH /admin/accounts/{accountId}/status
+
+Request
+{
+  "status": "FROZEN | ACTIVE"
+}
+
+6. High Level Transaction Monitoring
+GET /admin/transactions
+
+Query Params
+?type=TRANSFER|DEPOSIT|WITHDRAW
+?fromDate=YYYY-MM-DD
+?toDate=YYYY-MM-DD
+
+7. Reports & Audit Logs
+GET /admin/reports/summary
+
+Response
+{
+  "totalCustomers": 1320,
+  "totalAccounts": 2100,
+  "totalBalance": 5200000,
+  "transactionsToday": 420
+}
+
+                            Employee Module
+
+1. Customer Onboarding
+POST /employee/customers
+
+Request
+{
+  "name": "string",
+  "email": "string",
+  "phone": "string",
+  "address": "string",
+  "idProof": "string"
+}
+
+2. Update Customer Profile
+PUT /employee/customers/{customerId}
+
+Request
+{
+  "address": "string",
+  "phone": "string"
+}
+
+3. Change Customer Status
+PATCH /employee/customers/{customerId}/status
+
+Request
+{
+  "status": "ACTIVE | SUSPENDED"
+}
+
+4. Open Bank Account
+POST /employee/accounts
+
+Request
+{
+  "customerId": "string",
+  "accountType": "SAVINGS | CURRENT",
+  "initialDeposit": 500
+}
+
+5. Account Closure
+PATCH /employee/accounts/{accountId}/close
+
+Request
+{
+  "reason": "string"
+}
+
+6. Cash Deposit
+POST /employee/accounts/{accountId}/deposit
+
+Request
+{
+  "amount": 1000
+}
+
+7. Cash Withdrawal
+POST /employee/accounts/{accountId}/withdraw
+
+Request
+{
+  "amount": 1000
+}
+
+8. Loan Application Verification
+PUT /employee/loans/{loanId}/verify
+
+Request
+{
+  "verified": true,
+  "remarks": "Documents verified"
+}
+
+9. Loan Approval/Rejection
+PATCH /employee/loans/{loanId}/status
+
+Request
+{
+  "status": "APPROVED | REJECTED",
+  "remarks": "string"
+}
+
+10. Issue / Replace Card
+POST /employee/cards
+
+Request
+{
+  "customerId": "string",
+  "accountId": "string",
+  "cardType": "DEBIT | CREDIT"
+}
+
+
+                            Customer Module 
+
+1. View Profile
+GET /customer/profile
+
+2. Update Profile
+PUT /customer/profile
+
+Request
+{
+  "phone": "string",
+  "address": "string"
+}
+
+3. View Accounts
+GET /customer/accounts
+
+4. View Account Details
+GET /customer/accounts/{accountId}
+
+5. Transaction History
+GET /customer/accounts/{accountId}/transactions
+
+6. Transfer Funds
+POST /customer/transactions/transfer
+
+Request
+{
+  "fromAccountId": "string",
+  "toAccountNumber": "string",
+  "amount": 500
+}
+
+7. Apply for Loan
+POST /customer/loans
+
+Request
+{
+  "accountId": "string",
+  "loanAmount": 50000,
+  "loanType": "PERSONAL | AUTO | HOME",
+  "tenureMonths": 24
+}
+
+8. View Loans
+GET /customer/loans
+
+9. Request Card
+POST /customer/cards
+
+Request
+{
+  "accountId": "string",
+  "cardType": "DEBIT | CREDIT"
+}
+
+10. Support Ticket
+Create Ticket
+POST /customer/tickets
+
+Request
+{
+  "subject": "string",
+  "message": "string"
+}
+
+Response
+{
+  "ticketId": "string",
+  "status": "OPEN"
+}
+
+
+
+______________________________________________________________________________
+
+               ADMIN FEATURES
+1. Employee Management (Create, Update, Status Control)
+Why
+
+Banks require controlled access. Employees manage accounts, money, and customer data, so admins must be able to create or restrict their privileges.
+
+
+Admin can:
+
+Add new employees
+
+Update employee information
+
+Activate, suspend, or terminate accounts
+
+Admin uses employee management endpoints. The system validates:
+
+Unique email
+
+Role must be EMPLOYEE
+
+Status changes affect login permissions
+
+Employee records are stored in the employee table with role-based access ties.
+
+2. Customer Oversight (Status Management)
+Why
+
+Admins must override employee decisions for compliance, fraud detection, or legal cases.
+
+Admin can change customer status to:
+
+ACTIVE
+
+SUSPENDED
+
+BLOCKED
+
+Admin sends a patch request to modify the customer status field.
+Blocked customer cannot log in or perform transactions.
+
+3. System-Wide Account Monitoring
+
+Management needs visibility into bank performance and account activity.
+
+
+Admin can view all accounts with:
+
+Holder name
+
+Balance
+
+Status
+
+Type
+
+
+Admin requests aggregated account data.
+Filters like active, frozen, high-balance accounts can be applied.
+
+4. Freeze/Unfreeze Accounts
+
+
+Required for investigations, fraud, suspicious activity, or regulatory requests.
+
+
+
+Admin controls whether an account:
+
+Is fully operational
+
+Frozen (no debit/credit allowed)
+
+Admin updates status on the account record.
+System checks “FROZEN” status before processing any transaction.
+
+5. High-Level Transaction Monitoring
+
+
+Banks must comply with audit and anti-money-laundering regulations.
+
+
+Admin can see:
+
+All deposits
+
+Withdrawals
+
+Transfers
+
+Suspicious flags
+
+
+Data is fetched using transaction logs with filters for:
+
+Date range
+
+Amount
+
+Employee who processed it
+
+Customer
+
+6. Loan Policy & Approval Management
+
+Loan rules differ per bank and must be controlled centrally.
+
+
+
+Admin can:
+
+Set interest rates
+
+Set maximum approval limits
+
+Approve high-value loans (beyond employee authority)
+
+
+Policies stored in a settings table.
+Employee approval checks against these thresholds.
+
+7. Reporting & Audit Logging
+
+
+Management requires performance insights and auditing for compliance.
+
+
+
+Admin gets:
+
+Total customers
+
+Total accounts
+
+Total balance
+
+Daily/monthly transactions
+
+Compliance logs
+
+
+
+Backend aggregates values from:
+
+Customers
+
+Accounts
+
+Transaction logs
+
+Loans
+
+Audit table
+
+                  EMPLOYEE FEATURES
+
+
+1. Customer Onboarding
+
+
+Employees create customer records when someone opens a bank account in a branch.
+
+
+Employee collects:
+
+Name
+
+Contact details
+
+Address
+
+KYC documents
+
+
+Employee submits the onboarding form.
+System validates KYC and stores customer information.
+
+2. Update Customer Profile
+
+
+Customer details may change (address, phone, etc.).
+
+
+
+Employee updates relevant fields to keep records accurate.
+
+
+
+Employee sends update request to the customer service module.
+Only allowed fields are updated, old data is logged.
+
+3. Change Customer Status
+
+
+Needed for:
+
+KYC updates pending
+
+Non-compliance
+
+Temporary disabling
+
+
+
+Employee can mark customer as ACTIVE or SUSPENDED.
+
+
+Employee updates status in the customer table.
+Suspended customers cannot transact.
+
+4. Open Bank Account
+
+
+Customers need accounts to deposit or withdraw money.
+
+
+Employee opens:
+
+Savings account
+
+Current account
+
+
+Employee selects customer → chooses type → enters initial deposit.
+System generates a unique account number.
+
+5. Account Closure Request
+
+
+Customers may close accounts when not needed.
+
+
+
+Employee submits a closure request with reason.
+
+
+
+Account status changes to CLOSED.
+Balance must be zero before closure.
+
+6. Cash Deposit (Branch Transaction)
+
+
+Customers often deposit money physically at branches.
+
+
+
+Employee adds cash to the customer account.
+
+
+
+Employee enters amount → system credits account → transaction logged.
+
+7. Cash Withdrawal (Branch Transaction)
+
+
+Cash withdrawal in-branch requires verification.
+
+
+
+Employee allows debit after verifying identity.
+
+
+
+Employee enters amount → system checks balance → debits account.
+
+8. Loan Application Verification
+
+
+Every loan requires document verification.
+
+
+
+Employee verifies:
+
+Income proof
+
+ID proof
+
+Banking history
+
+
+Employee marks loan as "verified" with remarks.
+Only verified applications go to approval stage.
+
+9. Loan Approval / Rejection
+
+
+Low-value loans can be approved at branch level.
+
+
+
+Employee updates loan status:
+
+APPROVED
+
+REJECTED
+
+
+Employee checks verification → updates status.
+System records decision + remarks.
+
+10. Card Issuance / Replacement
+
+
+Customers request new debit/credit cards.
+
+
+
+Employee initiates:
+
+New card request
+
+Replacement card
+
+
+Employee selects account → enters card type → system generates card details and sends request to card-processing subsystem.
+
+🟩 CUSTOMER FEATURES – EXPLANATION (10 Features)
+1. View Profile
+
+
+Customer needs access to personal details.
+
+
+Shows name, email, phone, address.
+
+
+
+Customer hits profile endpoint → system fetches from database.
+
+2. Update Profile
+
+
+Information changes over time.
+
+
+
+Customer can update:
+
+Phone
+
+Address
+
+
+
+Customer submits update → system validates → record updated.
+
+3. View Accounts
+
+
+Users must see their bank accounts.
+
+
+
+Shows:
+
+Account type
+
+Account number
+
+Balance
+
+Status
+
+
+
+Customer requests account listing → system fetches related accounts.
+
+4. View Account Details
+
+
+To see full information about a single account.
+
+
+
+Displays:
+
+Recent transactions
+
+Limits
+
+Branch info
+
+
+Fetches account by ID with details.
+
+5. Transaction History
+
+Customers need financial tracking.
+
+
+
+Shows all transactions:
+
+Debit
+
+Credit
+
+Transfer
+
+Date/time
+
+
+
+Customer queries the transaction table for that account.
+
+6. Transfer Funds
+
+
+Core banking feature.
+
+
+Transfers money to:
+
+Own accounts
+
+Other customers in bank
+
+External bank account
+
+
+
+Customer enters from → to → amount → system checks:
+
+Balance
+
+Account status
+
+Transfer limits
+→ Then creates transaction.
+
+7. Apply for Loan
+
+
+Customers request personal, home, auto loans.
+
+
+
+Customer submits:
+
+Amount
+
+Purpose
+
+Tenure
+
+
+
+Loan is marked as PENDING → goes to employee verification.
+
+8. View Loan Status
+
+
+Customer wants updates.
+
+
+
+Shows:
+
+Pending
+
+Verified
+
+Approved
+
+Rejected
+
+System fetches loan records belonging to the customer.
+
+9. Request Card
+
+
+Customers need debit/credit cards.
+
+
+Request includes:
+
+Account
+
+Card type
+
+
+
+Customer submits → employee handles card issue workflow.
+
+10. Raise Support Ticket
+
+
+Customers need help for:
+
+Transaction errors
+
+Service issues
+
+Technical issues
+
+
+
+Customer creates a support ticket with subject + message.
+
+
+
+Ticket stored in support_tickets table → employee responds later.

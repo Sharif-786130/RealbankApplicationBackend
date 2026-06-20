@@ -1,0 +1,389 @@
+Authentication(Common for all Users)
+-----------------------------------
+
+Login
+-----
+
+Endpoint:-POST /api/v1/auth/login
+
+Request
+-------
+	{
+	   "email":"admin@bank.com",
+	   "password":"Admin@123"
+	}
+Response
+--------
+	{
+  	  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  	  "role": "ADMIN",
+  	  "expiresIn": 3600
+	}
+Hiring new Officers
+-------------------
+Endpoints:-POST /api/v1/admin/employee
+---------
+
+Request
+-------
+	{
+ 	  "name": "Ravi Kumar",
+ 	  "email": "ravi@bank.com",
+ 	  "phone": "9876543210",
+ 	  "designation": "Loan Officer"
+	}
+Response
+--------
+	{
+  	  "employeeId": 101,
+          "message": "Employee created successfully"
+	}
+
+Getting All Employees details
+-----------------------------
+Endpoints:-GET /api/v1/admin/employees
+---------
+Response
+--------
+	[
+  	  {
+    	    "employeeId": 101,
+    	    "name": "Ravi Kumar",
+            "designation": "Loan Officer",
+    	    "status": "ACTIVE"
+          }
+        ]
+Update Employee
+---------------
+Endpoint:- PUT /api/v1/admin/employee/{employeeId}
+
+Request
+-------
+	{
+           "designation": "Senior Loan Officer",
+           "status": "ACTIVE"
+  	}
+Response
+--------
+	{
+	  "message": "Employee updated successfully"
+	}
+Deactive Employee
+-----------------
+Endpoint:- DELETE /api/v1/admin/employee/{employeeId}
+--------
+
+Response
+--------
+	{
+	   "message": "Employee deactivated successfully"
+	}
+
+Large Transaction Approval
+--------------------------
+Endpoint:-GET /api/v1/admin/transaction/pending
+
+Response
+--------
+[
+  {
+    "transactionId": 5001,
+    "accountNumber": "123456789",
+    "amount": 250000,
+    "type": "TRANSFER",
+    "status": "PENDING"
+  }
+]
+
+Approve/Reject Transaction
+--------------------------
+Endpoint:- PUT /api/v1/admin/transactions/{transactionId}/decision
+
+Request
+-------
+{
+  "decision": "APPROVED",
+  "remarks": "Verified and approved"
+}
+Response
+--------
+{
+  "message": "Transaction approved successfully"
+}
+
+Loan Approval
+-------------
+View Loan Requests
+
+Endpoint:- GET /api/v1/admin/loans/pending
+
+Response
+--------
+[
+  {
+    "loanId": 9001,
+    "customerId": 301,
+    "amount": 500000,
+    "type": "HOME_LOAN",
+    "status": "PENDING"
+  }
+]
+
+Approve / Reject Loan
+
+Endpoint:- PUT /api/v1/manager/loans/{loanId}/decision
+--------
+
+Request
+-------
+
+{
+  "decision": "REJECTED",
+  "remarks": "Low credit score"
+}
+
+Response
+--------
+{
+  "message": "Loan rejected successfully"
+}
+
+Customer Management(View Only)
+
+View All Customers
+-----------------
+Endpoint:- GET /api/v1/manager/customers
+--------
+
+Response
+--------
+
+[
+  {
+    "customerId": 301,
+    "name": "Amit Sharma",
+    "email": "amit@gmail.com",
+    "accountStatus": "ACTIVE"
+  }
+]
+
+View Customer Accounts
+----------------------
+Endpoint:- GET /api/v1/manager/customers/{customerId}/accounts
+---------
+
+Response
+--------
+
+[
+  {
+    "accountNumber": "123456789",
+    "balance": 150000,
+    "type": "SAVINGS"
+  }
+]
+
+System Logs
+-----------
+
+View Logs
+---------
+
+Endpoint:- GET /api/v1/manager/logs
+--------
+
+Query Params:-?level=ERROR&date=2026-01-20
+------------
+
+Response
+--------
+
+[
+  {
+    "logId": 7001,
+    "level": "ERROR",
+    "message": "Transaction failed",
+    "timestamp": "2026-01-20T10:45:00"
+  }
+]
+
+Support Tickets & Complaints
+----------------------------
+
+view All Tickets
+----------------
+Endpoint:- GET /api/v1/manager/tickets
+
+Response
+--------
+
+[
+  {
+    "ticketId": 8001,
+    "customerId": 301,
+    "issue": "Transaction failed",
+    "status": "OPEN"
+  }
+]
+
+Close Ticket
+------------
+
+Endpoint:- PUT /api/v1/manager/tickets/{ticketId}/close
+--------
+
+Request
+-------
+{
+  "resolution": "Issue resolved successfully"
+}
+
+Response
+--------
+{
+  "message": "Ticket closed successfully"
+}
+
+Notifications
+-------------
+
+Send System Notification
+------------------------
+Endpoint:- POST /api/v1/admin/notifications
+--------
+
+Request
+-------
+
+{
+  "title": "Maintenance Alert",
+  "message": "System maintenance on Jan 25, 12 AM",
+  "targetRole": "CUSTOMER"
+}
+
+Response
+--------
+{
+  "message": "Notification sent successfully"
+}
+
+Standard Error Response
+-----------------------
+{
+  "timestamp": "2026-01-21T10:15:30",
+  "status": 403,
+  "error": "Forbidden",
+  "message": "Access denied",
+  "path": "/api/v1/manager/employees"
+} 
+
+
+Refresh Token
+-------------
+Complete Flow
+-------------
+  1.User logs in
+
+  2.Server returns:
+    accessToken
+    refreshToken
+
+  3.Access token expires
+
+  4.Client calls /refresh-token
+
+  5..Server validates refresh token
+
+  6.Server issues new access token
+
+ 7.User continues without login
+
+Login Response
+--------------
+Endpoint:- POST /api/v1/auth/login
+
+Response
+--------
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiJ9.access",
+  "refreshToken": "eyJhbGciOiJIUzI1NiJ9.refresh",
+  "tokenType": "Bearer",
+  "expiresIn": 900
+}
+
+  Refresh Token
+  -------------
+  Endpoint:-POST /api/v1/auth/refresh-token
+  --------
+
+Request
+-------
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiJ9.refresh"
+}
+
+Success Response(200 0k)
+------------------------
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiJ9.newAccess",
+  "refreshToken": "eyJhbGciOiJIUzI1NiJ9.newRefresh",
+  "tokenType": "Bearer",
+  "expiresIn": 900
+}
+
+Best practice: Rotate refresh token (issue new one every time)
+
+Refresh Token Expired / invalid (401)
+-----------------------------------
+
+{
+  "status": 401,
+  "error": "UNAUTHORIZED",
+  "message": "Refresh token expired. Please login again."
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
